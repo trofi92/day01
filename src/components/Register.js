@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../firebase-config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
-const JoinEmail = () => {
+const Register = () => {
   const register = async () => {
     try {
       const user = await createUserWithEmailAndPassword(
@@ -38,8 +38,6 @@ const JoinEmail = () => {
 
   return (
     <form
-      // method="POST"
-      // action="/user-logged-in"
       onSubmit={onSubmit}
       style={{
         display: "flex",
@@ -111,4 +109,4 @@ const JoinEmail = () => {
     </form>
   );
 };
-export default JoinEmail;
+export default Register;
