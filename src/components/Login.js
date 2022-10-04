@@ -1,73 +1,97 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+import { authService } from "../firebase-config";
 
 export const Login = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
+  const [user, setUser] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleIdInput = (e) => {
-    setId(e.target.value);
-  };
+  //setState : login
+  useEffect(() => {
+    onAuthStateChanged(authService, (currentUser) => {
+      if (user) {
+        return;
+      } else {
+        setUser(currentUser);
+      }
+    });
+  });
 
-  const handlePwInput = (e) => {
-    setPw(e.target.value);
-  };
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (id !== "" && pw !== "") {
-      return setIsLoggedIn(true);
-    } else {
-      alert("WTF?");
+  //login
+  const login = async () => {
+    try {
+      const user = await signInWithEmailAndPassword(
+        authService,
+        email,
+        pw
+      );
+      console.log(user);
+      setIsLoggedIn(true);
+    } catch (e) {
+      setIsLoggedIn(false);
+      return e.message.replace("Error : ", "지랄;");
     }
   };
 
-  return (
-    <>
-      {isLoggedIn ? (
-        <h1>Welcome to Hell</h1>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <hr />
-          <label>ID : </label>
-          <input
-            name="id"
-            onChange={handleIdInput}
-            style={{ width: "200px" }}
-            type="text"
-            required
-            maxLength="12"
-          />
-          <label>PW : </label>
-          <input
-            name="pw"
-            onChange={handlePwInput}
-            style={{ width: "200px" }}
-            type="password"
-            required
-            maxLength="8"
-          />
-          <div style={{ display: "inline-block" }}>
-            <button
-              type="submit"
-              onClick={onSubmit}
-              style={{ width: "100px" }}
-            >
-              Login
-            </button>
+  //logout
+  const logout = async () => {
+    await signOut(authService);
+    console.log(user);
 
-            <Link to="/join">
-              <button style={{ width: "100px" }}>Join</button>
-            </Link>
-          </div>
+    setIsLoggedIn(false);
+  };
+
+  return isLoggedIn ? (
+    <div>
+      <button onClick={logout} style={{ width: "70px" }}>
+        Logout
+      </button>
+      <h1>{email}</h1>
+    </div>
+  ) : (
+    <form onSubmit={login}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <hr />
+        <label>EMAIL : </label>
+        <input
+          placeholder="Email"
+          name="email"
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          style={{ width: "200px" }}
+        />
+        <label>PW : </label>
+        <input
+          placeholder="Password"
+          name="pw"
+          onChange={(e) => {
+            setPw(e.target.value);
+          }}
+          style={{ width: "200px" }}
+          type="password"
+        />
+        <div style={{ display: "inline-block" }}>
+          <button onClick={login} style={{ width: "70px" }}>
+            Login
+          </button>
+          <Link to="/joinEmail">
+            <button style={{ width: "70px" }}>Join</button>
+          </Link>
         </div>
-      )}
-    </>
+      </div>
+    </form>
   );
 };

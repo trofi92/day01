@@ -1,9 +1,23 @@
 import useInput from "../hooks/use-input";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../firebase-config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
-const JoinValid = () => {
+const JoinEmail = () => {
+  const register = async () => {
+    try {
+      const user = await createUserWithEmailAndPassword(
+        authService,
+        validValue.email,
+        validValue.pw
+      );
+      console.log(user);
+    } catch (e) {
+      return e.message.replace("Error : ", "제대로 좀 입력해라;");
+    }
+  };
+
   const navigator = useNavigate();
-
   const {
     value: validValue,
     isValid,
@@ -15,12 +29,17 @@ const JoinValid = () => {
   } = useInput((value) => value !== "");
 
   const emailRegex =
-    /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+    /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,50})$/i;
+
+  const passwordRegex =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,12}$/;
 
   console.log(validValue);
 
   return (
     <form
+      // method="POST"
+      // action="/user-logged-in"
       onSubmit={onSubmit}
       style={{
         display: "flex",
@@ -29,34 +48,32 @@ const JoinValid = () => {
         color: "black",
       }}
     >
+      <div className="form-control">
+        <label>E-mail : </label>
+        <input
+          name="email"
+          onBlur={onBlurHandler}
+          onChange={onChangeHandler}
+          placeholder="이메일 주소"
+          style={{ width: "200px" }}
+          type="email"
+          maxLength="50"
+        />
+        {hasError && (
+          <p className="error-text">이메일 주소를 작성하라고</p>
+        )}
+      </div>
       <div className="control-group">
-        <div className={inputClasses}>
-          <label htmlFor="ID">ID : </label>
-          <input
-            type="text"
-            name="id"
-            onBlur={onBlurHandler}
-            onChange={onChangeHandler}
-            placeholder="ID"
-            style={{ width: "200px" }}
-            required
-            minLength="5"
-            maxLength="12"
-          />
-          {hasError && (
-            <p className="error-text">ID must not be empty</p>
-          )}
-        </div>
+        <div className={inputClasses}></div>
         <div className="form-control">
           <label htmlFor="PW">PW : </label>
           <input
             name="pw"
             onBlur={onBlurHandler}
             onChange={onChangeHandler}
-            placeholder="PW"
+            placeholder="8~12자, 특수문자, 숫자 각 1개 이상"
             style={{ width: "200px" }}
             type="password"
-            required
             minLength="8"
             maxLength="12"
           />
@@ -67,25 +84,11 @@ const JoinValid = () => {
             name="cpw"
             onBlur={onBlurHandler}
             onChange={onChangeHandler}
-            placeholder="Check your PW"
+            placeholder="비밀번호를 확인해주세요"
             style={{ width: "200px" }}
             type="password"
-            required
             minLength="8"
             maxLength="12"
-          />
-        </div>
-        <div className="form-control">
-          <label>E-mail : </label>
-          <input
-            name="email"
-            onBlur={onBlurHandler}
-            onChange={onChangeHandler}
-            placeholder="E-MAIL"
-            style={{ width: "200px" }}
-            type="email"
-            required
-            maxLength="50"
           />
         </div>
       </div>
@@ -94,10 +97,11 @@ const JoinValid = () => {
           disabled={!isValid}
           onClick={() =>
             validValue.pw === validValue.cpw &&
-            validValue.id > 7 &&
-            validValue.pw > 7 &&
+            passwordRegex.test(validValue.pw) &&
+            validValue.pw.length > 7 &&
+            validValue.cpw.length > 7 &&
             emailRegex.test(validValue.email) === true
-              ? navigator("/")
+              ? register() && navigator("/")
               : alert("check your form, dumbass")
           }
         >
@@ -107,4 +111,4 @@ const JoinValid = () => {
     </form>
   );
 };
-export default JoinValid;
+export default JoinEmail;

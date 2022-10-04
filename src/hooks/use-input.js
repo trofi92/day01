@@ -1,14 +1,13 @@
 import { useState } from "react";
 const useInput = (validation) => {
   const [enteredValue, setEnteredValue] = useState({
-    id: "",
+    email: "",
     pw: "",
     cpw: "",
-    email: "",
   });
   const [isTouched, setIsTouched] = useState(false);
 
-  const enteredValueIsValid = validation(enteredValue.id);
+  const enteredValueIsValid = validation(enteredValue.email);
   const hasError = isTouched && !enteredValueIsValid;
   const reset = () => {
     setEnteredValue("");
@@ -19,7 +18,6 @@ const useInput = (validation) => {
     : "form-control";
 
   const onBlurHandler = (e) => {
-    // e.target.focus();
     setIsTouched(true);
   };
 
@@ -40,6 +38,7 @@ const useInput = (validation) => {
 
   return {
     value: enteredValue,
+    setEnteredValue: setEnteredValue,
     isValid: enteredValueIsValid,
     hasError,
     onBlurHandler,

@@ -1,6 +1,7 @@
 import { Home } from "./pages/Home";
 import JoinValid from "./components/JoinValid";
 import { Routes, Route } from "react-router-dom";
+import JoinEmail from "./components/JoinEmail";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/join" element={<JoinValid />} />
+        <Route path="/joinEmail" element={<JoinEmail />} />
       </Routes>
     </>
   );
