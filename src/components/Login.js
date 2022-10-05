@@ -3,21 +3,24 @@ import { Link } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  browserSessionPersistence,
+  setPersistence,
   signOut,
 } from "firebase/auth";
-import { authService } from "../firebase-config";
+import { authService, firebaseConfig } from "../firebase-config";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [user, setUser] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const auth = authService;
+  // const apiKey = firebaseConfig.apiKey;
   //setState : login
   useEffect(() => {
     onAuthStateChanged(authService, (currentUser) => {
       if (user) {
-        return;
+        setPersistence(auth, browserSessionPersistence);
       } else {
         setUser(currentUser);
       }
@@ -56,7 +59,7 @@ export const Login = () => {
       <h1>{email}</h1>
     </div>
   ) : (
-    <form onSubmit={login}>
+    <form onSubmit={(e) => e.preventDefault()}>
       <div
         style={{
           display: "flex",
@@ -87,7 +90,7 @@ export const Login = () => {
           <button onClick={login} style={{ width: "70px" }}>
             Login
           </button>
-          <Link to="/joinEmail">
+          <Link to="/register">
             <button style={{ width: "70px" }}>Join</button>
           </Link>
         </div>
