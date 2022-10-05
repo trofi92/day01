@@ -99,7 +99,7 @@ const Register = () => {
             validValue.pw.length > 7 &&
             validValue.cpw.length > 7 &&
             emailRegex.test(validValue.email) === true
-              ? register() && navigator("/")
+              ? register() && navigator("/", { replace: true })
               : alert("check your form, dumbass")
           }
         >

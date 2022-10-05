@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
@@ -8,6 +8,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { authService } from "../firebase-config";
+import { loggedIn, loggedOut } from "../utils";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,11 +19,10 @@ export const Login = () => {
   useLayoutEffect(() => {
     onAuthStateChanged(authService, (currentUser) => {
       if (user) {
-        // setUser(currentUser);
-        console.log(currentUser);
         currentUser !== null
           ? setIsLoggedIn(true)
           : setIsLoggedIn(false);
+        console.log(currentUser);
         return setPersistence(authService, browserSessionPersistence);
       } else {
         setUser(currentUser);
@@ -35,6 +35,7 @@ export const Login = () => {
   const login = async () => {
     try {
       await signInWithEmailAndPassword(authService, email, pw);
+      loggedIn();
     } catch (e) {
       return e.message.replace("Error : ", "지랄;");
     }
@@ -43,6 +44,7 @@ export const Login = () => {
   //logout
   const logout = async () => {
     await signOut(authService);
+    loggedOut();
     sessionStorage.clear();
     console.log(user);
   };
@@ -52,7 +54,9 @@ export const Login = () => {
       <button onClick={logout} style={{ width: "70px" }}>
         Logout
       </button>
-      <h1>{user.email}</h1>
+      <Link to="/dashboard">
+        <p style={{ cursor: "pointer" }}>Go to Dashboard</p>
+      </Link>
     </div>
   ) : (
     <form onSubmit={(e) => e.preventDefault()}>
@@ -63,7 +67,7 @@ export const Login = () => {
         }}
       >
         <hr />
-        <label>EMAIL : </label>
+        <label>Email : </label>
         <input
           placeholder="Email"
           name="email"
@@ -72,7 +76,7 @@ export const Login = () => {
           }}
           style={{ width: "200px" }}
         />
-        <label>PW : </label>
+        <label>Password : </label>
         <input
           placeholder="Password"
           name="pw"
