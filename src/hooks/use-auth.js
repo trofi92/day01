@@ -1,10 +1,9 @@
-import { useCallback, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { auth } from '@U/initializer/firebase';
-import { actions } from '@/redux/user/state';
-import firebase from 'firebase/app';
+import { useCallback, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { auth } from "@U/initializer/firebase";
+import { actions } from "@/redux/user/state";
+import firebase from "firebase/app";
 // https://vroomfan.tistory.com/7
-
 
 const useAuth = () => {
   const dispatch = useDispatch();
@@ -12,11 +11,11 @@ const useAuth = () => {
   useEffect(() => {
     auth.onAuthStateChanged((currentUser) => {
       if (currentUser) {
-        dispatch(actions.setValue('email', currentUser.email));
-        dispatch(actions.setValue('uid', currentUser.uid));
+        dispatch(actions.setValue("email", currentUser.email));
+        dispatch(actions.setValue("uid", currentUser.uid));
       } else {
-        dispatch(actions.setValue('email', null));
-        dispatch(actions.setValue('uid', null));
+        dispatch(actions.setValue("email", null));
+        dispatch(actions.setValue("uid", null));
       }
       dispatch(actions.setLoading(false));
     });
@@ -30,7 +29,7 @@ const useAuth = () => {
     try {
       await auth.signInWithRedirect(provider);
     } catch {
-      toast('인터넷이 불안정합니다. 다시 시도해주세요.');
+      alert("인터넷이 불안정합니다. 다시 시도해주세요.");
     }
   }, [dispatch]);
 
@@ -41,7 +40,7 @@ const useAuth = () => {
     try {
       await auth.signOut();
     } finally {
-      ...
+      //시발
     }
   }, [dispatch]);
 
