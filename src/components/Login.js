@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
@@ -7,38 +7,35 @@ import {
   setPersistence,
   signOut,
 } from "firebase/auth";
-import { authService, firebaseConfig } from "../firebase-config";
+import { authService } from "../firebase-config";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [user, setUser] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const auth = authService;
-  // const apiKey = firebaseConfig.apiKey;
-  //setState : login
-  useEffect(() => {
+
+  useLayoutEffect(() => {
     onAuthStateChanged(authService, (currentUser) => {
       if (user) {
-        setPersistence(auth, browserSessionPersistence);
+        // setUser(currentUser);
+        console.log(currentUser);
+        currentUser !== null
+          ? setIsLoggedIn(true)
+          : setIsLoggedIn(false);
+        return setPersistence(authService, browserSessionPersistence);
       } else {
         setUser(currentUser);
       }
+      return currentUser;
     });
   });
 
   //login
   const login = async () => {
     try {
-      const user = await signInWithEmailAndPassword(
-        authService,
-        email,
-        pw
-      );
-      console.log(user);
-      setIsLoggedIn(true);
+      await signInWithEmailAndPassword(authService, email, pw);
     } catch (e) {
-      setIsLoggedIn(false);
       return e.message.replace("Error : ", "지랄;");
     }
   };
@@ -46,9 +43,8 @@ export const Login = () => {
   //logout
   const logout = async () => {
     await signOut(authService);
+    sessionStorage.clear();
     console.log(user);
-
-    setIsLoggedIn(false);
   };
 
   return isLoggedIn ? (
@@ -56,7 +52,7 @@ export const Login = () => {
       <button onClick={logout} style={{ width: "70px" }}>
         Logout
       </button>
-      <h1>{email}</h1>
+      <h1>{user.email}</h1>
     </div>
   ) : (
     <form onSubmit={(e) => e.preventDefault()}>
